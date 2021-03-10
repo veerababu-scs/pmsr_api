@@ -126,9 +126,7 @@ module RailsJwtAuth
       end
 
       def get_by_token(token)
-        if defined?(Mongoid) && ancestors.include?(Mongoid::Document)
-          where(auth_tokens: token).first
-        elsif defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
+        if defined?(ActiveRecord) && ancestors.include?(ActiveRecord::Base)
           where('auth_tokens like ?', "%#{token}%").first
         end
       end

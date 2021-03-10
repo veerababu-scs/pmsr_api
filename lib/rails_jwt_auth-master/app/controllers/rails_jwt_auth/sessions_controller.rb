@@ -15,10 +15,14 @@ module RailsJwtAuth
 
     def destroy
       return render_404 unless RailsJwtAuth.simultaneous_sessions > 0
-
-      authenticate!
-      current_user.destroy_auth_token @jwt_payload['auth_token']
-      render plain:"User Logout Successfully"
+      authenticate
+        if @check.to_i == 1
+          if current_user.destroy_auth_token @jwt_payload['auth_token']
+            render_profile("User Logout Successfully")
+          end
+        else
+          render_421("User Session Already Expired")
+        end      
     end
   end
 end

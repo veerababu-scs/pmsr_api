@@ -13,17 +13,6 @@ module RailsJwtAuth
       render json: resource, root: true, status: 200
     end
 
-    def render_222
-      render plain: "Confirmation Email Has been to the User Email"
-    end
-
-
-
-    def render_223
-      render json:"Email Confirmation Done"
-    end
-
-
     def render_204
       head 204
     end
@@ -34,6 +23,10 @@ module RailsJwtAuth
 
     def render_410
       head 410
+    end
+
+    def render_421(resource)
+      render json: resource, status: 422
     end
 
     def render_422(errors)
