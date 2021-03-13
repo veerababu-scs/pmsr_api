@@ -8,12 +8,12 @@ module RailsJwtAuth
     before_action :authenticate!
 
     def show
-      render_profile current_user
+      render_profile current_user.email
     end
 
     def update
       if current_user.update(profile_update_params)
-        render_204
+        render_profile("User Profile Updated Successfully")
       else
         render_422(current_user.errors.details)
       end
@@ -21,7 +21,7 @@ module RailsJwtAuth
 
     def password
       if current_user.update_password(update_password_params)
-        render_204
+        render_profile("Password Updated Successfully")
       else
         render_422(current_user.errors.details)
       end
@@ -31,7 +31,7 @@ module RailsJwtAuth
       return update unless current_user.is_a?(RailsJwtAuth::Confirmable)
 
       if current_user.update_email(profile_update_email_params)
-        render_204
+        render_profile("Email Id Changed/Updated Successfully")
       else
         render_422(current_user.errors.details)
       end

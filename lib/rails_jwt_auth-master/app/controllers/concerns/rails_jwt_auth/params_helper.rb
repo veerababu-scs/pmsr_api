@@ -33,9 +33,8 @@ module RailsJwtAuth
     end
 
     def profile_update_params
-      params.require(:profile).except(
-        RailsJwtAuth.auth_field_name, :current_password, :password, :password_confirmation
-      )
+      params.require(:profile).permit(:org_id, :name, :gender, :dob,:job_role, :address, :mobile)
+        #RailsJwtAuth.auth_field_name, :current_password, :password, :password_confirmation
     end
 
     def profile_update_password_params

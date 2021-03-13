@@ -5,12 +5,9 @@ module RailsJwtAuth
 
     def create
       se = Session.new(session_create_params)
-
       if se.generate!(request)
-        puts "hello"
         render_session se.jwt, se.user
       else
-        puts "hello1"
         render_422 se.errors.details
       end
     end
