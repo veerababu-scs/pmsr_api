@@ -44,7 +44,6 @@ class TasksController < ApplicationController
         @tc = Array.new()
         @tt = 0
         @projects.each do |item|
-
         	@tasks = Project.find(item.id).tasks
         	@tasks.each do |t|
         		tasks = {
@@ -56,17 +55,95 @@ class TasksController < ApplicationController
         			"Project Name"=>t.project.project_name.titleize
         		}
         	@tc.push(tasks)
-        	end
-        	
+        	end	
         @tt = @tt + @tasks.count
         end
-
         output = {
             "Total No of Tasks" => @tt,
             "Tasks List" => @tc
         }
-        
         render( json: TaskSerializer.render_info(output), status: 200 )
+	
+	end
+
+	def task_details
+
+		@task = Task.find(params[:id]) rescue nil
+		if !@task.nil?	
+			if @task.project.user.id == current_user.id
+				task = {
+				"Task Name" => @task.name.titleize,
+				"Task Title"=> @task.title.titleize,
+				"Task Status"=> @task.status.titleize,
+				"Task Time" => "#{@task.task_time} Hours",
+				"Task Created on" => @task.task_date.strftime("%a %d-%b-%Y"),
+				"Project Name"=> @task.project.project_name.titleize,
+				}
+				output = {
+					"Task Details" => task
+				}
+				render( json: TaskSerializer.render_info(output), status: 200 )
+			else
+				render( json: TaskSerializer.render_error("User Does Not Have any Task"), status: 422 )
+			end	
+        else
+        	render( json: TaskSerializer.render_error("Task Not Found"), status: 422 )
+        end
+
+	end
+
+	def edit_task
+
+		@task = Task.find(params[:id]) rescue nil
+		if !@task.nil?			
+		 	if @task.project.user.id == current_user.id				
+				@task.name = params[:name]
+				@task.title = params[:title]
+				@task.status = params[:status]
+				@task.task_time = params[:task_time]
+				@task.task_date = DateTime.now				
+		 		if @task.save!					
+					task = {
+						"Task Name" => @task.name.titleize,
+						"Task Title"=> @task.title.titleize,
+						"Task Status"=> @task.status.titleize,
+						"Task Time" => "#{@task.task_time} Hours",
+						"Task Created on" => @task.task_date.strftime("%a %d-%b-%Y")
+					}
+					output = {
+						"Message" => "Task Updated Succcessfully",
+						"Task Details" => task
+					}
+					render( json: TaskSerializer.render_info(output), status: 200 )
+				end
+		 	else
+ 				render( json: TaskSerializer.render_error("Invalid Task"), status: 422 )
+		 	end
+	    else
+	       	render( json: TaskSerializer.render_error("Task Not Found"), status: 422 )
+	    end
+
+	end
+
+	def delete_task
+
+		@task = Task.find(params[:id]) rescue nil		
+		if !@task.nil?			
+			if @task.project.user.id == current_user.id
+				@task.destroy
+				if @task.destroy
+				output = {
+				"Message" => "Task Deleted Succcessfully"
+				}
+				end
+				render( json: TaskSerializer.render_info(output), status: 200 )	
+			else
+				render( json: TaskSerializer.render_error("Task Not Found"), status: 422 )
+			end
+		else
+			render( json: TaskSerializer.render_error("Task Not Found"), status: 422 )
+		end
+		
 	end
 
 end
